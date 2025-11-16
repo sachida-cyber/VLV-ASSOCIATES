@@ -1,174 +1,547 @@
-<!DOCTYPE html>
+<!-- index.html - Single-page LMS (All features combined, single long page)
+     - Purpose: Single-page static site combining landing, courses, dashboard, player, admin (GitHub upload)
+     - Designed for: Bangalore Tier-1 audience; features inspired by top USA edtech/product sites
+     - Instructions: Save as `index.html` at repository root. All assets are inline (CSS+JS).
+     - Note: To fully publish, add `courses/` JSON files and `/uploads/*` media or use Admin -> GitHub upload.
+-->
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>VLV ASSOCIATES | Plumbing • Interiors • Electrical • Construction</title>
-  <meta name="description" content="VLV ASSOCIATES offers emergency plumbing, interiors, electrical, tiling, and complete construction services. Fast response, transparent pricing, and trusted experts." />
-
-  <!-- Minimal embedded CSS for fast LCP -->
-  <style>
-    body { margin:0; font-family:system-ui,Arial,sans-serif; color:#222; background:#fff; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid #eee; position:sticky; top:0; background:white; z-index:50; }
-    nav a { margin-left:14px; text-decoration:none; color:#333; font-size:14px; }
-    .btn { padding:12px 20px; border-radius:8px; text-decoration:none; display:inline-block; }
-    .btn-primary { background:#0b6bff; color:#fff; }
-    .btn-secondary { background:#0bb36b; color:#fff; }
-    .hero { padding:60px 20px; text-align:center; color:#fff;
-            background:url('https://images.unsplash.com/photo-1560185127-6ed189bf02bb?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat; }
-    .hero h1 { font-size:32px; font-weight:800; margin:0 0 10px; text-shadow:0 2px 4px rgba(0,0,0,0.3); }
-    .hero p { font-size:18px; text-shadow:0 2px 4px rgba(0,0,0,0.3); }
-    .catalog, .services, .trust, .footer { padding:40px 20px; max-width:1200px; margin:auto; }
-    h2 { font-size:26px; margin-bottom:20px; }
-    .grid { display:grid; gap:20px; }
-    .grid-3 { grid-template-columns:1fr; }
-    @media(min-width:768px) {
-      .grid-3 { grid-template-columns:repeat(3,1fr); }
-    }
-    .card { border:1px solid #eee; border-radius:10px; padding:20px; background:#fafafa; }
-    .card h3 { margin-top:0; }
-    .footer { background:#111; color:#ddd; padding:40px 20px; }
-    .footer a { color:#fff; text-decoration:none; }
-  </style>
-
-  <!-- JSON-LD LocalBusiness for SEO -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"LocalBusiness",
-    "name":"VLV ASSOCIATES",
-    "image":"https://example.com/logo.png",
-    "telephone":"+91XXXXXXXXXX",
-    "address":{
-      "@type":"PostalAddress",
-      "streetAddress":"Your Street",
-      "addressLocality":"Your City",
-      "addressRegion":"Your State",
-      "addressCountry":"IN"
-    },
-    "priceRange":"₹₹",
-    "description":"Plumbing, Interiors, Electrical, Tiling, and Complete Construction Services"
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Training Platform — Single Page LMS</title>
+<meta name="description" content="Static single-page training platform — courses, admin, player, offline cache, GitHub uploader."/>
+<style>
+  /* ---------- Design tokens ---------- */
+  :root{
+    --bg:#f5f8fc; --card:#fff; --muted:#6b7280; --accent:#0056d6; --accent-2:#07b7c7;
+    --glass: rgba(255,255,255,0.7); --radius:12px; --shadow: 0 8px 28px rgba(13,30,64,0.08);
+    --success:#10b981; --danger:#ef4444; --maxw:1100px;
   }
-  </script>
-
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#071029;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  .container{max-width:var(--maxw);margin:0 auto;padding:20px}
+  header.site-header{background:linear-gradient(90deg,var(--accent),#2d6edb);color:#fff;padding:14px 0}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{font-weight:700;color:#fff;font-size:18px}
+  .nav a{color:rgba(255,255,255,0.95);margin-left:16px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:none;cursor:pointer}
+  .btn-primary{background:#fff;color:var(--accent);font-weight:600}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.15);color:#fff}
+  /* Hero */
+  .hero{display:flex;gap:24px;align-items:center;padding:40px 0}
+  .hero-left{flex:1}
+  .hero h1{margin:0;font-size:28px}
+  .lead{color:var(--muted);margin-top:10px}
+  .hero-cta{margin-top:18px;display:flex;gap:12px}
+  .hero-right{width:320px}
+  .hero-card{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow)}
+  /* services */
+  .services{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:18px}
+  .service{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow);text-align:center}
+  .service strong{display:block}
+  /* courses */
+  .section{margin:28px 0}
+  .course-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:space-between;min-height:140px}
+  .thumb{width:64px;height:64px;border-radius:10px;background:linear-gradient(180deg,#60a5fa,#1e40af);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;margin-right:12px}
+  .card-top{display:flex;gap:12px;align-items:center}
+  .muted{color:var(--muted)}
+  .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .btn-outline{background:transparent;border:1px solid #e6eef8;padding:8px 10px;border-radius:8px;cursor:pointer}
+  /* dashboard mini */
+  .dashboard-mini{display:flex;gap:12px;flex-wrap:wrap}
+  .dash-card{background:linear-gradient(180deg,#fff,#f7fbff);padding:12px;border-radius:10px;box-shadow:var(--shadow);min-width:220px}
+  .progress{height:10px;background:#eef6ff;border-radius:8px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--success),var(--accent-2));width:0}
+  /* player modal */
+  .modal{position:fixed;inset:0;background:rgba(7,16,32,0.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:1200}
+  .modal.open{display:flex}
+  .player{width:100%;max-width:1100px;background:var(--card);border-radius:12px;display:grid;grid-template-columns:320px 1fr;overflow:hidden;box-shadow:0 24px 48px rgba(7,12,24,0.4)}
+  .player-sidebar{padding:12px;border-right:1px solid #f0f4ff;max-height:70vh;overflow:auto}
+  .player-main{padding:16px}
+  .lesson-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  .topic-btn{padding:10px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border:1px solid #f2f6ff}
+  .topic-btn.locked{opacity:0.45;cursor:not-allowed}
+  .tick{color:var(--success)}
+  .text-lesson{white-space:pre-wrap;color:#213042;line-height:1.5}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:#0b1220;color:#fff;padding:8px 12px;border-radius:10px;display:none}
+  /* admin */
+  .admin{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);margin-top:12px}
+  .admin input,.admin textarea,.admin select{width:100%;padding:10px;border-radius:8px;border:1px solid #eef3fb;margin:8px 0}
+  /* footer */
+  footer{padding:28px 0;text-align:center;color:var(--muted)}
+  /* responsive */
+  @media(max-width:920px){ .hero{flex-direction:column}.player{grid-template-columns:1fr}.player-sidebar{max-height:40vh} .header-inner{flex-direction:column;align-items:flex-start} .nav a{margin-left:12px} }
+</style>
 </head>
 <body>
 
-<header>
-  <div style="font-weight:700; font-size:20px;">VLV ASSOCIATES</div>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/services/">Services</a>
-    <a href="/gallery/">Gallery</a>
-    <a href="/about/">About</a>
-    <a href="/contact/">Contact</a>
-    <a class="btn-primary" href="tel:+91XXXXXXXXXX">Call Now</a>
-  </nav>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="brand">
+      <div class="logo">training<span style="color:#fff;font-weight:700">platform</span></div>
+      <nav class="nav" aria-label="main">
+        <a href="#courses" style="color:rgba(255,255,255,0.95);margin-left:14px">Courses</a>
+        <a href="#dashboard" style="color:rgba(255,255,255,0.95);margin-left:14px">Dashboard</a>
+        <a href="#admin" style="color:rgba(255,255,255,0.95);margin-left:14px">Admin</a>
+      </nav>
+    </div>
+
+    <div>
+      <button class="btn btn-ghost" id="btn-login">Login</button>
+      <button class="btn btn-primary" id="btn-enroll-all" title="Quick enroll demo">Quick Start</button>
+    </div>
+  </div>
 </header>
 
-<!-- HERO BLOCK -->
-<section class="hero">
-  <h1>Emergency Plumbing • Interiors • Full Construction</h1>
-  <p>Fast response • Transparent pricing • Trusted technicians • Same-day service</p>
-  <br />
-  <a class="btn-primary btn" href="tel:+91XXXXXXXXXX">Call Now — 24/7</a>
-  <a class="btn-secondary btn" href="/contact/">Request Service</a>
-</section>
-
-<!-- CATALOG SECTION -->
-<section class="catalog">
-  <h2>What We Do</h2>
-  <div class="grid grid-3">
-    <div class="card">
-      <h3>Plumbing Services</h3>
-      <p>Emergency repairs, water heaters, leak fixing, drainage, fittings.</p>
-      <a href="/services/emergency-plumbing/" class="btn-secondary btn">Explore</a>
+<!-- HERO -->
+<section class="container hero" id="hero">
+  <div class="hero-left">
+    <h1>Upskill with focused, practical training — Bangalore ready</h1>
+    <p class="lead">Short video lessons, downloadable PDFs, text notes and local progress tracking. Works on GitHub Pages & Replit. Designed for Tier-1 Bangalore learners.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" id="heroStart">Start Learning</button>
+      <a class="btn btn-outline" href="#courses">Browse Courses</a>
     </div>
-
-    <div class="card">
-      <h3>Interiors & Designing</h3>
-      <p>Home/Office interiors, modular kitchens, false ceiling, 3D designing.</p>
-      <a href="/services/plumbing-for-interiors/" class="btn-secondary btn">Explore</a>
-    </div>
-
-    <div class="card">
-      <h3>Complete Construction</h3>
-      <p>Electrical, Tiling, Flooring, Exterior works, Renovations & turnkey projects.</p>
-      <a href="/pricing/" class="btn-secondary btn">Learn More</a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-card">
+      <h4>Featured — Demo Course</h4>
+      <p class="muted">Try the demo to verify offline & player features.</p>
+      <div style="margin-top:8px"><a class="btn btn-small" id="open-demo">Open Demo</a></div>
     </div>
   </div>
 </section>
 
-<!-- SERVICES SECTION -->
-<section class="services">
-  <h2>Our Key Services</h2>
-  <div class="grid grid-3">
-    <div class="card">
-      <h3>Emergency Plumbing</h3>
-      <p>Fast response for leaks, bursts, blockages.</p>
-      <a href="/services/emergency-plumbing/">View Service →</a>
-    </div>
-    <div class="card">
-      <h3>Drain Cleaning</h3>
-      <p>Jet cleaning, inspection, and blockage removal.</p>
-      <a href="/services/drain-cleaning/">View Service →</a>
-    </div>
-    <div class="card">
-      <h3>Water Heater Installation</h3>
-      <p>Installation, repair, servicing for all brands.</p>
-      <a href="/services/water-heater-installation/">View Service →</a>
-    </div>
-    <div class="card">
-      <h3>Interior Plumbing</h3>
-      <p>Bathrooms, kitchens, full interior projects.</p>
-      <a href="/services/plumbing-for-interiors/">View Service →</a>
-    </div>
-    <div class="card">
-      <h3>Exterior & Guttering</h3>
-      <p>Rainwater systems, outside pipelines, repairs.</p>
-      <a href="/services/exterior-plumbing-and-guttering/">View Service →</a>
-    </div>
-    <div class="card">
-      <h3>Dealers & Supplies</h3>
-      <p>Construction material supply & distribution.</p>
-      <a href="/dealers-supplies/">View Service →</a>
-    </div>
-  </div>
+<!-- SERVICES (inspired by top USA sites: clear benefits, trust signals) -->
+<section class="container services" style="margin-top:10px">
+  <div class="service"><strong>Practical Projects</strong><span class="muted">Hands-on assignments tailored to local industry</span></div>
+  <div class="service"><strong>Offline Ready</strong><span class="muted">JSON caching + local files</span></div>
+  <div class="service"><strong>Admin from Browser</strong><span class="muted">Upload to GitHub directly using PAT (safe storage not included)</span></div>
+  <div class="service"><strong>Progress & Locking</strong><span class="muted">Sequential learning; unlocks after completion</span></div>
 </section>
 
-<!-- TRUST SECTION -->
-<section class="trust">
-  <h2>Why Clients Choose Us</h2>
-  <div class="grid grid-3">
-    <div class="card">
-      <h3>Fast Response</h3>
-      <p>Emergency-ready teams available 24/7.</p>
+<!-- COURSES -->
+<section class="container section" id="courses">
+  <h2>Courses</h2>
+  <div id="courseGrid" class="course-grid" aria-live="polite"></div>
+  <div id="noCourses" class="muted" style="display:none">No courses found. Use Admin to create or add sample course JSON to /courses/</div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="container section" id="dashboard">
+  <h2>Your Dashboard</h2>
+  <div id="dashArea" class="dashboard-mini"></div>
+  <div style="margin-top:12px;color:var(--muted)">Only shows courses you enrolled in. Enroll from the Courses section.</div>
+</section>
+
+<!-- ADMIN (GitHub uploader + JSON editor) -->
+<section class="container section" id="admin">
+  <h2>Admin — GitHub CMS (Static)</h2>
+  <div class="admin" role="region" aria-label="admin">
+    <label>Repository (user/repo)</label>
+    <input id="adminRepo" placeholder="username/repo (e.g., sachida-cyber/training-platform-static)">
+    <label>Personal Access Token</label>
+    <input id="adminToken" placeholder="ghp_xxx (store privately; this page does not store server-side)">
+    <hr>
+    <h3>Create Course (client-side composer)</h3>
+    <input id="courseTitle" placeholder="Course title">
+    <input id="courseSlug" placeholder="course-slug (lowercase)">
+    <textarea id="courseDesc" placeholder="Short description"></textarea>
+    <div id="modulesArea"></div>
+    <div style="margin-top:8px">
+      <button class="btn btn-outline" id="addModuleBtn">Add Module</button>
+      <button class="btn btn-primary" id="saveCourseBtn">Save Course to GitHub</button>
     </div>
-    <div class="card">
-      <h3>Transparent Pricing</h3>
-      <p>Clear estimates before work begins.</p>
-    </div>
-    <div class="card">
-      <h3>Certified Technicians</h3>
-      <p>Professionals with warranty-backed work.</p>
-    </div>
+    <hr>
+    <h3>Upload Asset</h3>
+    <input type="file" id="assetFile">
+    <select id="assetFolder">
+      <option value="videos">videos</option>
+      <option value="pdfs">pdfs</option>
+      <option value="images">images</option>
+      <option value="lessons">lessons</option>
+    </select>
+    <button class="btn btn-primary" id="uploadAssetBtn">Upload to GitHub</button>
+    <div class="muted" style="margin-top:6px">Notes: GitHub API requires a PAT with repo access. Files are committed directly to the repository path `/uploads/{folder}/filename` and course JSON to `/courses/{slug}.json`.</div>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="footer">
-  <div style="max-width:1200px; margin:auto;">
-    <h3>VLV ASSOCIATES</h3>
-    <p>Your trusted partner for plumbing, interiors, electrical, tiling, and turnkey construction.</p>
-    <br />
-    <div>
-      <a href="/privacy/">Privacy Policy</a> •
-      <a href="/terms/">Terms</a> •
-      <a href="/sitemap.xml">Sitemap</a>
-    </div>
-    <p style="margin-top:20px;">© 2025 VLV ASSOCIATES. All rights reserved.</p>
-  </div>
+<footer>
+  <div class="container">© Training Platform • Designed for Bangalore (Tier-1) • Static & Offline-capable</div>
 </footer>
 
+<!-- PLAYER MODAL -->
+<div class="modal" id="playerModal" aria-hidden="true">
+  <div class="player" role="dialog" aria-modal="true">
+    <div class="player-sidebar" id="playerSidebar"></div>
+    <div class="player-main" id="playerMain">
+      <div class="lesson-header" id="lessonHeader">
+        <div id="lessonTitle"><strong>Select a lesson</strong></div>
+        <div id="lessonType" class="muted"></div>
+      </div>
+      <div id="lessonBody"><div class="muted">Choose a topic from the left to begin.</div></div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn btn-outline" id="closePlayer">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Complete previous lesson first.</div>
+
+<!-- ---------- Inline JS (All engines combined) ---------- -->
+<script>
+/* ========= Utilities & Boot ========= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const CACHE_PREFIX = 'lms_cache_';
+
+/* Demo course fallback (if /courses/demo.json not present) */
+const DEMO_COURSE = {
+  title: "Demo Course",
+  slug: "demo",
+  description: "Quick demo course for validation",
+  modules: [
+    { title: "Module 1", topics: [
+        { title: "Intro Video", type: "video", file: "/uploads/videos/intro.mp4" },
+        { title: "Getting Started (Text)", type: "text", file: "/uploads/lessons/lesson1.txt" }
+      ]
+    },
+    { title: "Module 2", topics: [
+        { title: "Welcome PDF", type: "pdf", file: "/uploads/pdfs/welcome.pdf" }
+      ]
+    }
+  ]
+};
+
+/* On DOM ready */
+document.addEventListener('DOMContentLoaded', () => {
+  bindUI();
+  loadCourseIndex();
+  loadDashboard();
+});
+
+/* ========= Data / Persistence: progress + enrolled + user ========= */
+function getProgress(slug){ return JSON.parse(localStorage.getItem('progress_'+slug) || '{}'); }
+function saveProgress(slug, data){ localStorage.setItem('progress_'+slug, JSON.stringify(data)); }
+function markComplete(slug, mi, ti){
+  const p = getProgress(slug);
+  if(!p[mi]) p[mi] = {};
+  p[mi][ti] = true;
+  saveProgress(slug, p);
+}
+
+function isUnlocked(slug, mi, ti, course){
+  if(mi === 0 && ti === 0) return true;
+  const p = getProgress(slug);
+  if(ti > 0) return p[mi] && p[mi][ti-1];
+  if(mi > 0){
+    const lastIdx = course.modules[mi-1].topics.length - 1;
+    return p[mi-1] && p[mi-1][lastIdx];
+  }
+  return false;
+}
+
+function enrolledList(){ return JSON.parse(localStorage.getItem('enrolled_courses') || '[]'); }
+function enroll(slug){ const arr = enrolledList(); if(!arr.includes(slug)) { arr.push(slug); localStorage.setItem('enrolled_courses', JSON.stringify(arr)); loadDashboard(); renderCourseCards(); } }
+function unenroll(slug){ const arr = enrolledList(); const idx = arr.indexOf(slug); if(idx>-1){ arr.splice(idx,1); localStorage.setItem('enrolled_courses', JSON.stringify(arr)); loadDashboard(); renderCourseCards(); } }
+
+/* ========= UI Binding ========= */
+function bindUI(){
+  $('#heroStart').addEventListener('click', ()=> { if(!localStorage.getItem('user')) localStorage.setItem('user','Guest'); location.href='#dashboard'; loadDashboard(); });
+  $('#open-demo').addEventListener('click', ()=> openCourseModal('demo'));
+  $('#btn-enroll-all').addEventListener('click', ()=> { if(!localStorage.getItem('user')) localStorage.setItem('user','Guest'); // enroll demo fast
+    enroll('demo'); alert('Demo enrolled — check Dashboard'); });
+  $('#btn-login').addEventListener('click', ()=> { let name = prompt('Enter your name'); if(!name) return; localStorage.setItem('user', name); alert('Logged in as '+name); loadDashboard(); });
+  $('#closePlayer').addEventListener('click', ()=> closeModal());
+  $('#addModuleBtn').addEventListener('click', ()=> addAdminModule());
+  $('#saveCourseBtn').addEventListener('click', ()=> saveCourseToGitHub());
+  $('#uploadAssetBtn').addEventListener('click', ()=> uploadAssetToGitHub());
+}
+
+/* ========= Course Index Loading & Rendering ========= */
+async function fetchJSON(path){
+  try{
+    const r = await fetch(path, {cache:'no-store'});
+    if(!r.ok) throw new Error('not ok');
+    const j = await r.json();
+    localStorage.setItem(CACHE_PREFIX + path, JSON.stringify(j));
+    return j;
+  }catch(e){
+    const cached = localStorage.getItem(CACHE_PREFIX + path);
+    if(cached) return JSON.parse(cached);
+    return null;
+  }
+}
+
+async function loadCourseIndex(){
+  // Attempt to fetch courses/index.json — if not present, generate from existing files or fallback demo
+  let index = await fetchJSON('courses/index.json');
+  if(!index){
+    // Try to build index by scanning /courses/*.json via fetch of demo only
+    const demo = await fetchJSON('courses/demo.json'); // if present
+    if(demo) index = [{title: demo.title, slug: demo.slug || 'demo', description: demo.description||''}];
+    else index = [{title: DEMO_COURSE.title, slug: DEMO_COURSE.slug, description: DEMO_COURSE.description}];
+  }
+  renderCourseCards(index);
+  return index;
+}
+
+function renderCourseCards(indexList){
+  const grid = $('#courseGrid'); grid.innerHTML = '';
+  const list = indexList || JSON.parse(localStorage.getItem(CACHE_PREFIX + 'courses/index.json') || '[]') || [];
+  const enrolled = enrolledList();
+  // If indexList is empty but demo missing, ensure demo visible
+  const items = list.length ? list : [{title:DEMO_COURSE.title, slug:DEMO_COURSE.slug, description:DEMO_COURSE.description}];
+  items.forEach(c => {
+    const card = document.createElement('article'); card.className = 'card';
+    const left = document.createElement('div'); left.className='card-top';
+    const th = document.createElement('div'); th.className='thumb'; th.textContent = c.title.charAt(0);
+    const info = document.createElement('div'); info.innerHTML = `<div><strong>${c.title}</strong></div><div class="muted">${c.description || ''}</div>`;
+    left.appendChild(th); left.appendChild(info);
+    const footer = document.createElement('div'); footer.className='card-footer';
+    const rightActions = document.createElement('div');
+    const viewBtn = document.createElement('a'); viewBtn.className='btn btn-outline'; viewBtn.textContent='View'; viewBtn.href = '#'; viewBtn.onclick = (ev)=>{ ev.preventDefault(); openCourseModal(c.slug); };
+    const enrollBtn = document.createElement('button'); enrollBtn.className='btn btn-primary';
+    enrollBtn.textContent = enrolled.includes(c.slug) ? 'Unenroll' : 'Enroll';
+    enrollBtn.onclick = ()=> {
+      if(enrolledList().includes(c.slug)){ unenroll(c.slug); enrollBtn.textContent='Enroll'; }
+      else{ enroll(c.slug); enrollBtn.textContent='Unenroll'; }
+    };
+    rightActions.appendChild(viewBtn); rightActions.appendChild(enrollBtn);
+    footer.appendChild(rightActions);
+    card.appendChild(left); card.appendChild(footer);
+    grid.appendChild(card);
+  });
+}
+
+/* ========= Dashboard ========= */
+async function loadDashboard(){
+  const area = $('#dashArea'); area.innerHTML = '';
+  const enrolled = enrolledList();
+  if(!enrolled.length){ area.innerHTML = '<div class="muted">You are not enrolled in any courses. Browse <a href="#courses">courses</a>.</div>'; return; }
+  // For each enrolled course, fetch json and compute progress
+  for(const slug of enrolled){
+    let course = await fetchJSON(`courses/${slug}.json`);
+    if(!course){
+      if(slug === DEMO_COURSE.slug) course = DEMO_COURSE;
+      else { area.innerHTML += `<div class="dash-card">Course ${slug} not found</div>`; continue; }
+    }
+    const percent = computeProgressPercent(course);
+    const card = document.createElement('div'); card.className='dash-card';
+    card.innerHTML = `<div><strong>${course.title}</strong><div class="muted small">${course.description||''}</div></div>
+      <div style="margin-top:8px"><div class="progress"><div class="progress-fill" style="width:${percent}%"></div></div><div style="text-align:right;margin-top:6px">${percent}%</div></div>
+      <div style="margin-top:8px;display:flex;justify-content:space-between"><a class="btn btn-outline" href="#" onclick="openCourseModal('${course.slug}')">Open</a><button class="btn btn-outline" onclick="unenroll('${course.slug}')">Unenroll</button></div>`;
+    area.appendChild(card);
+  }
+}
+function computeProgressPercent(course){
+  const p = getProgress(course.slug || 'demo'); let done=0,total=0;
+  course.modules.forEach((m,mi) => m.topics.forEach((t,ti)=>{ total++; if(p[mi] && p[mi][ti]) done++; }));
+  return total? Math.round(done/total*100):0;
+}
+
+/* ========= Player Modal: render course, sidebar, player ========= */
+let CURRENT_COURSE = null;
+async function openCourseModal(slug){
+  // fetch course json
+  let course = await fetchJSON(`courses/${slug}.json`);
+  if(!course){
+    if(slug === DEMO_COURSE.slug) course = DEMO_COURSE;
+    else return alert('Course not found: '+slug);
+  }
+  CURRENT_COURSE = course;
+  const sidebar = $('#playerSidebar'); sidebar.innerHTML = `<h3 style="margin-top:0">${course.title}</h3><div class="muted">${course.description||''}</div><hr/>`;
+  course.modules.forEach((m,mi) => {
+    const modTitle = document.createElement('h4'); modTitle.textContent = m.title; sidebar.appendChild(modTitle);
+    m.topics.forEach((t,ti) => {
+      const btn = document.createElement('div'); btn.className='topic-btn';
+      const unlocked = isUnlocked(course.slug || 'demo', mi, ti, course);
+      if(!unlocked) btn.classList.add('locked');
+      btn.innerHTML = `<span>${t.title}</span><span class="muted">${t.type}</span><span class="tick">${getTick(course.slug||'demo',mi,ti)?'✔':''}</span>`;
+      btn.onclick = ()=> {
+        if(!unlocked){ showToast('Complete previous lesson first.'); return; }
+        loadLesson(course, mi, ti);
+      };
+      sidebar.appendChild(btn);
+    });
+  });
+  // open modal
+  $('#playerModal').classList.add('open'); $('#playerModal').setAttribute('aria-hidden','false');
+  // Auto-load first unlocked topic
+  for(let mi=0; mi<course.modules.length; mi++){
+    for(let ti=0; ti<course.modules[mi].topics.length; ti++){
+      if(isUnlocked(course.slug||'demo', mi, ti, course)){ loadLesson(course, mi, ti); return; }
+    }
+  }
+}
+
+function closeModal(){ $('#playerModal').classList.remove('open'); $('#playerModal').setAttribute('aria-hidden','true'); $('#playerMain #lessonBody').innerHTML=''; }
+
+function getTick(slug,mi,ti){ const p = getProgress(slug); return p[mi] && p[mi][ti]; }
+
+async function loadLesson(course, mi, ti){
+  const topic = course.modules[mi].topics[ti];
+  $('#lessonTitle').innerHTML = `<strong>${topic.title}</strong>`; $('#lessonType').textContent = topic.type.toUpperCase();
+  const body = $('#lessonBody'); body.innerHTML = '';
+  if(topic.type === 'video'){
+    // create HTML5 video
+    const vid = document.createElement('video'); vid.controls = true; vid.src = topic.file; vid.style.width = '100%';
+    vid.onended = ()=> { markComplete(course.slug||'demo', mi, ti); renderSidebarTick(course); loadNextIfAny(course, mi, ti); updateDashboardAndIndex(); };
+    body.appendChild(vid);
+  } else if(topic.type === 'pdf'){
+    const emb = document.createElement('embed'); emb.src = topic.file; emb.type='application/pdf'; emb.style.width='100%'; emb.style.height='640px';
+    body.appendChild(emb);
+  } else if(topic.type === 'text'){
+    try{ const resp = await fetch(topic.file); const txt = await resp.text(); const div = document.createElement('div'); div.className='text-lesson'; div.innerText = txt; body.appendChild(div); } catch(e){ body.innerHTML = '<div class="muted">Text lesson not found</div>'; }
+  } else if(topic.type === 'image'){
+    const img = document.createElement('img'); img.src = topic.file; img.style.maxWidth='100%'; body.appendChild(img);
+  } else {
+    body.innerHTML = '<div class="muted">Unsupported lesson type</div>';
+  }
+}
+
+/* Mark tick in sidebar and optionally auto-unlock next */
+function renderSidebarTick(course){
+  // Re-render sidebar ticks
+  const sidebar = $('#playerSidebar'); // rebuild quickly
+  sidebar.innerHTML = `<h3 style="margin-top:0">${course.title}</h3><div class="muted">${course.description||''}</div><hr/>`;
+  course.modules.forEach((m,mi) => {
+    const modTitle = document.createElement('h4'); modTitle.textContent = m.title; sidebar.appendChild(modTitle);
+    m.topics.forEach((t,ti) => {
+      const btn = document.createElement('div'); btn.className='topic-btn';
+      const unlocked = isUnlocked(course.slug||'demo', mi, ti, course);
+      if(!unlocked) btn.classList.add('locked');
+      btn.innerHTML = `<span>${t.title}</span><span class="muted">${t.type}</span><span class="tick">${getTick(course.slug||'demo',mi,ti)?'✔':''}</span>`;
+      btn.onclick = ()=> {
+        if(!unlocked){ showToast('Complete previous lesson first.'); return; }
+        loadLesson(course, mi, ti);
+      };
+      sidebar.appendChild(btn);
+    });
+  });
+}
+
+function loadNextIfAny(course, mi, ti){
+  // find next topic unlocked: if same module next topic else next module first topic
+  const m = course.modules[mi];
+  if(ti+1 < m.topics.length){ // next topic
+    if(isUnlocked(course.slug||'demo', mi, ti+1, course)){ loadLesson(course, mi, ti+1); return; }
+  } else if(mi+1 < course.modules.length){
+    if(isUnlocked(course.slug||'demo', mi+1, 0, course)){ loadLesson(course, mi+1, 0); return; }
+  }
+  // else nothing auto
+  updateDashboardAndIndex();
+}
+
+/* ========= Toast ========= */
+function showToast(msg, t=1800){ const toast = $('#toast'); toast.textContent = msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none', t); }
+
+/* ========= Admin: modules UI builder ========= */
+function addAdminModule(){
+  const area = $('#modulesArea');
+  const mid = Date.now();
+  const div = document.createElement('div'); div.style.border = '1px dashed #eef6ff'; div.style.padding='8px'; div.style.borderRadius='8px'; div.dataset.mid = mid;
+  div.innerHTML = `<input placeholder="Module title" class="m-title" style="width:100%;padding:8px;margin-bottom:8px"/><div class="m-topics"></div><button class="btn btn-outline add-topic">Add topic</button> <button class="btn btn-ghost remove-module" style="margin-left:8px">Remove</button>`;
+  area.appendChild(div);
+  div.querySelector('.add-topic').onclick = ()=> {
+    const tdiv = document.createElement('div'); tdiv.style.display='flex'; tdiv.style.gap='8px'; tdiv.style.marginTop='8px';
+    tdiv.innerHTML = `<input placeholder="Topic title" class="t-title" style="flex:2;padding:8px"/><input placeholder="type (video/pdf/text/image)" class="t-type" style="flex:1;padding:8px"/><input placeholder="file path (/uploads/...)" class="t-file" style="flex:2;padding:8px"/><button class="btn btn-ghost remove-topic">X</button>`;
+    tdiv.querySelector('.remove-topic').onclick = ()=> tdiv.remove();
+    div.querySelector('.m-topics').appendChild(tdiv);
+  };
+  div.querySelector('.remove-module').onclick = ()=> div.remove();
+}
+
+/* ========= Admin: GitHub uploader + course saver ========= */
+async function uploadAssetToGitHub(){
+  const repo = $('#adminRepo').value.trim(); const token = $('#adminToken').value.trim();
+  const file = $('#assetFile').files[0]; const folder = $('#assetFolder').value;
+  if(!repo || !token || !file) return alert('Repo, token and file required');
+  const path = `uploads/${folder}/${file.name}`;
+  const base64 = await fileToBase64(file);
+  const body = { message: `upload ${file.name}`, content: base64.split(',')[1] };
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    method: 'PUT',
+    headers: { 'Authorization': 'token ' + token },
+    body: JSON.stringify(body)
+  });
+  if(res.ok) alert('Uploaded '+path); else { const txt = await res.text(); alert('Upload failed: '+txt); }
+}
+function fileToBase64(file){ return new Promise((res, rej)=>{ const fr = new FileReader(); fr.onload = ()=> res(fr.result); fr.onerror = rej; fr.readAsDataURL(file); }); }
+
+async function saveCourseToGitHub(){
+  const repo = $('#adminRepo').value.trim(); const token = $('#adminToken').value.trim();
+  const title = $('#courseTitle').value.trim(); const slug = $('#courseSlug').value.trim().toLowerCase(); const desc = $('#courseDesc').value.trim();
+  if(!repo || !token || !title || !slug) return alert('Repo, token, title and slug required');
+  const modules = [];
+  $$('#modulesArea > div').forEach(md => {
+    const mt = md.querySelector('.m-title').value.trim() || 'Module';
+    const topics = [];
+    $$(md).forEach(()=>{}); // noop to ensure NodeList compat
+    md.querySelectorAll('.m-topics > div').forEach(td => {
+      const tt = td.querySelector('.t-title').value.trim() || 'Topic';
+      const ty = td.querySelector('.t-type').value.trim() || 'text';
+      const tf = td.querySelector('.t-file').value.trim() || '';
+      topics.push({ title: tt, type: ty, file: tf });
+    });
+    modules.push({ title: mt, topics });
+  });
+  const json = { title, slug, description: desc, modules };
+  const path = `courses/${slug}.json`;
+  const body = { message: `create course ${slug}`, content: btoa(JSON.stringify(json, null, 2)) };
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    method: 'PUT',
+    headers: { 'Authorization': 'token ' + token },
+    body: JSON.stringify(body)
+  });
+  if(res.ok) { alert('Course saved to '+path); /* Optionally update index locally */ await addToIndexLocal({title,slug,description:desc}); renderCourseCards(await loadCourseIndex()); } else { const txt = await res.text(); alert('Save failed: '+txt); }
+}
+
+async function addToIndexLocal(item){
+  // Attempt to fetch existing index; if not exist, create cache
+  let index = await fetchJSON('courses/index.json');
+  if(!index) index = JSON.parse(localStorage.getItem(CACHE_PREFIX+'courses/index.json')||'[]');
+  index = index || [];
+  if(!index.find(x=>x.slug===item.slug)){ index.push(item); localStorage.setItem(CACHE_PREFIX+'courses/index.json', JSON.stringify(index)); }
+}
+
+/* ========= Helpers ========= */
+function openCourseModalFromCache(slug){
+  openCourseModal(slug);
+}
+function showToast(msg){ const t=$('#toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',1800); }
+
+/* ========= Helper to update UI after progress changes ========= */
+function updateDashboardAndIndex(){ loadDashboard(); loadCourseIndex(); }
+
+/* ========= Small polyfills / exports for console testing ========= */
+window.enroll = enroll;
+window.unenroll = unenroll;
+window.openCourseModal = openCourseModal;
+window.loadCourseIndex = loadCourseIndex;
+
+/* On initial: ensure demo cached if not present */
+(async function ensureDemo(){
+  // try to fetch demo.json; if not present, set in local cache so UI finds it
+  const demoExists = await fetchJSON('courses/demo.json');
+  if(!demoExists) localStorage.setItem(CACHE_PREFIX+'courses/demo.json', JSON.stringify(DEMO_COURSE));
+  // Also ensure index cache references demo
+  let idx = await fetchJSON('courses/index.json');
+  if(!idx){
+    const cachedIdx = JSON.parse(localStorage.getItem(CACHE_PREFIX+'courses/index.json')||'[]');
+    if(!cachedIdx.find(i=>i.slug==='demo')) cachedIdx.push({title:DEMO_COURSE.title,slug:DEMO_COURSE.slug,description:DEMO_COURSE.description});
+    localStorage.setItem(CACHE_PREFIX+'courses/index.json', JSON.stringify(cachedIdx));
+  }
+  // Render initial lists
+  renderCourseCards(JSON.parse(localStorage.getItem(CACHE_PREFIX+'courses/index.json')));
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VLV ASSOCIATES — Emergency Plumbers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+/* Minimal mobile-first CSS for performance */
+:root{--blue:#0b69ff;--green:#0bb370}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#111;margin:0}
+.header{display:flex;justify-content:space-between;align-items:center;padding:12px}
+.h-hero{padding:28px;text-align:center}
+.btn{padding:10px 14px;border-radius:8px;text-decoration:none;display:inline-block}
+.btn-primary{background:var(--blue);color:#fff}
+.input{padding:10px;border:1px solid #ddd;border-radius:6px}
+@media(min-width:640px){.h-hero{padding:48px}}
+</style>
+<script>
+function submitLead(e){
+  e.preventDefault();
+  var phone=document.getElementById('phone').value;
+  fetch('CRM_WEBHOOK_URL',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({phone,ts:Date.now()})});
+  alert('Request received — dispatcher will call you.');
+}
+</script>
+</head>
+<body>
+<header class="header">
+  <div style="font-weight:700">VLV ASSOCIATES</div>
+  <div><a class="btn btn-primary" href="tel:+91XXXXXXXXXX">Call Now</a></div>
+</header>
+
+<section class="h-hero">
+  <h1>Emergency Plumbers — VLV ASSOCIATES</h1>
+  <p>Fast local response. Transparent pricing. Same-day service.</p>
+
+  <div style="margin-top:12px">
+    <a class="btn btn-primary" href="tel:+91XXXXXXXXXX">Call — 24/7</a>
+    <form onsubmit="submitLead(event)" style="display:inline-block;margin-left:8px">
+      <input id="phone" class="input" placeholder="Phone" required />
+      <button class="btn" type="submit" style="background:var(--green);color:#fff">Request Service</button>
+    </form>
+  </div>
+</section>
+
+<!-- Additional sections here -->
+</body>
+</html>

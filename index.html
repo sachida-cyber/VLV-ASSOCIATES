@@ -1,49 +1,174 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VLV ASSOCIATES — Emergency Plumbers</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<style>
-/* Minimal mobile-first CSS for performance */
-:root{--blue:#0b69ff;--green:#0bb370}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#111;margin:0}
-.header{display:flex;justify-content:space-between;align-items:center;padding:12px}
-.h-hero{padding:28px;text-align:center}
-.btn{padding:10px 14px;border-radius:8px;text-decoration:none;display:inline-block}
-.btn-primary{background:var(--blue);color:#fff}
-.input{padding:10px;border:1px solid #ddd;border-radius:6px}
-@media(min-width:640px){.h-hero{padding:48px}}
-</style>
-<script>
-function submitLead(e){
-  e.preventDefault();
-  var phone=document.getElementById('phone').value;
-  fetch('CRM_WEBHOOK_URL',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({phone,ts:Date.now()})});
-  alert('Request received — dispatcher will call you.');
-}
-</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VLV ASSOCIATES | Plumbing • Interiors • Electrical • Construction</title>
+  <meta name="description" content="VLV ASSOCIATES offers emergency plumbing, interiors, electrical, tiling, and complete construction services. Fast response, transparent pricing, and trusted experts." />
+
+  <!-- Minimal embedded CSS for fast LCP -->
+  <style>
+    body { margin:0; font-family:system-ui,Arial,sans-serif; color:#222; background:#fff; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid #eee; position:sticky; top:0; background:white; z-index:50; }
+    nav a { margin-left:14px; text-decoration:none; color:#333; font-size:14px; }
+    .btn { padding:12px 20px; border-radius:8px; text-decoration:none; display:inline-block; }
+    .btn-primary { background:#0b6bff; color:#fff; }
+    .btn-secondary { background:#0bb36b; color:#fff; }
+    .hero { padding:60px 20px; text-align:center; color:#fff;
+            background:url('https://images.unsplash.com/photo-1560185127-6ed189bf02bb?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat; }
+    .hero h1 { font-size:32px; font-weight:800; margin:0 0 10px; text-shadow:0 2px 4px rgba(0,0,0,0.3); }
+    .hero p { font-size:18px; text-shadow:0 2px 4px rgba(0,0,0,0.3); }
+    .catalog, .services, .trust, .footer { padding:40px 20px; max-width:1200px; margin:auto; }
+    h2 { font-size:26px; margin-bottom:20px; }
+    .grid { display:grid; gap:20px; }
+    .grid-3 { grid-template-columns:1fr; }
+    @media(min-width:768px) {
+      .grid-3 { grid-template-columns:repeat(3,1fr); }
+    }
+    .card { border:1px solid #eee; border-radius:10px; padding:20px; background:#fafafa; }
+    .card h3 { margin-top:0; }
+    .footer { background:#111; color:#ddd; padding:40px 20px; }
+    .footer a { color:#fff; text-decoration:none; }
+  </style>
+
+  <!-- JSON-LD LocalBusiness for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"LocalBusiness",
+    "name":"VLV ASSOCIATES",
+    "image":"https://example.com/logo.png",
+    "telephone":"+91XXXXXXXXXX",
+    "address":{
+      "@type":"PostalAddress",
+      "streetAddress":"Your Street",
+      "addressLocality":"Your City",
+      "addressRegion":"Your State",
+      "addressCountry":"IN"
+    },
+    "priceRange":"₹₹",
+    "description":"Plumbing, Interiors, Electrical, Tiling, and Complete Construction Services"
+  }
+  </script>
+
 </head>
 <body>
-<header class="header">
-  <div style="font-weight:700">VLV ASSOCIATES</div>
-  <div><a class="btn btn-primary" href="tel:+91XXXXXXXXXX">Call Now</a></div>
+
+<header>
+  <div style="font-weight:700; font-size:20px;">VLV ASSOCIATES</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/services/">Services</a>
+    <a href="/gallery/">Gallery</a>
+    <a href="/about/">About</a>
+    <a href="/contact/">Contact</a>
+    <a class="btn-primary" href="tel:+91XXXXXXXXXX">Call Now</a>
+  </nav>
 </header>
 
-<section class="h-hero">
-  <h1>Emergency Plumbers — VLV ASSOCIATES</h1>
-  <p>Fast local response. Transparent pricing. Same-day service.</p>
+<!-- HERO BLOCK -->
+<section class="hero">
+  <h1>Emergency Plumbing • Interiors • Full Construction</h1>
+  <p>Fast response • Transparent pricing • Trusted technicians • Same-day service</p>
+  <br />
+  <a class="btn-primary btn" href="tel:+91XXXXXXXXXX">Call Now — 24/7</a>
+  <a class="btn-secondary btn" href="/contact/">Request Service</a>
+</section>
 
-  <div style="margin-top:12px">
-    <a class="btn btn-primary" href="tel:+91XXXXXXXXXX">Call — 24/7</a>
-    <form onsubmit="submitLead(event)" style="display:inline-block;margin-left:8px">
-      <input id="phone" class="input" placeholder="Phone" required />
-      <button class="btn" type="submit" style="background:var(--green);color:#fff">Request Service</button>
-    </form>
+<!-- CATALOG SECTION -->
+<section class="catalog">
+  <h2>What We Do</h2>
+  <div class="grid grid-3">
+    <div class="card">
+      <h3>Plumbing Services</h3>
+      <p>Emergency repairs, water heaters, leak fixing, drainage, fittings.</p>
+      <a href="/services/emergency-plumbing/" class="btn-secondary btn">Explore</a>
+    </div>
+
+    <div class="card">
+      <h3>Interiors & Designing</h3>
+      <p>Home/Office interiors, modular kitchens, false ceiling, 3D designing.</p>
+      <a href="/services/plumbing-for-interiors/" class="btn-secondary btn">Explore</a>
+    </div>
+
+    <div class="card">
+      <h3>Complete Construction</h3>
+      <p>Electrical, Tiling, Flooring, Exterior works, Renovations & turnkey projects.</p>
+      <a href="/pricing/" class="btn-secondary btn">Learn More</a>
+    </div>
   </div>
 </section>
 
-<!-- Additional sections here -->
+<!-- SERVICES SECTION -->
+<section class="services">
+  <h2>Our Key Services</h2>
+  <div class="grid grid-3">
+    <div class="card">
+      <h3>Emergency Plumbing</h3>
+      <p>Fast response for leaks, bursts, blockages.</p>
+      <a href="/services/emergency-plumbing/">View Service →</a>
+    </div>
+    <div class="card">
+      <h3>Drain Cleaning</h3>
+      <p>Jet cleaning, inspection, and blockage removal.</p>
+      <a href="/services/drain-cleaning/">View Service →</a>
+    </div>
+    <div class="card">
+      <h3>Water Heater Installation</h3>
+      <p>Installation, repair, servicing for all brands.</p>
+      <a href="/services/water-heater-installation/">View Service →</a>
+    </div>
+    <div class="card">
+      <h3>Interior Plumbing</h3>
+      <p>Bathrooms, kitchens, full interior projects.</p>
+      <a href="/services/plumbing-for-interiors/">View Service →</a>
+    </div>
+    <div class="card">
+      <h3>Exterior & Guttering</h3>
+      <p>Rainwater systems, outside pipelines, repairs.</p>
+      <a href="/services/exterior-plumbing-and-guttering/">View Service →</a>
+    </div>
+    <div class="card">
+      <h3>Dealers & Supplies</h3>
+      <p>Construction material supply & distribution.</p>
+      <a href="/dealers-supplies/">View Service →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST SECTION -->
+<section class="trust">
+  <h2>Why Clients Choose Us</h2>
+  <div class="grid grid-3">
+    <div class="card">
+      <h3>Fast Response</h3>
+      <p>Emergency-ready teams available 24/7.</p>
+    </div>
+    <div class="card">
+      <h3>Transparent Pricing</h3>
+      <p>Clear estimates before work begins.</p>
+    </div>
+    <div class="card">
+      <h3>Certified Technicians</h3>
+      <p>Professionals with warranty-backed work.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div style="max-width:1200px; margin:auto;">
+    <h3>VLV ASSOCIATES</h3>
+    <p>Your trusted partner for plumbing, interiors, electrical, tiling, and turnkey construction.</p>
+    <br />
+    <div>
+      <a href="/privacy/">Privacy Policy</a> •
+      <a href="/terms/">Terms</a> •
+      <a href="/sitemap.xml">Sitemap</a>
+    </div>
+    <p style="margin-top:20px;">© 2025 VLV ASSOCIATES. All rights reserved.</p>
+  </div>
+</footer>
+
 </body>
 </html>
